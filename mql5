@@ -1,0 +1,67 @@
+mql5
+//+------------------------------------------------------------------+
+//|                           GTX Scalper                            |
+//|              Developed by Forex Robot Easy Team                   |
+//|                   Website: forexroboteasy.com                     |
+//+------------------------------------------------------------------+
+
+//--- Include necessary libraries and define input parameters
+#include <Trade\Trade.mqh>
+
+input double MaxDrawdown = 0.05; // Maximum allowed drawdown
+
+//--- Declare global variables
+CTrade trade; // Trade object
+
+//+------------------------------------------------------------------+
+//| Expert initialization function                                    |
+//+------------------------------------------------------------------+
+int OnInit()
+{
+   //--- Initialize trade object
+   trade.SetExpertMagicNumber(123456); // Set expert magic number
+   trade.SetDeviationInPoints(10); // Set deviation in points
+   
+   return(INIT_SUCCEEDED);
+}
+
+//+------------------------------------------------------------------+
+//| Expert tick function                                              |
+//+------------------------------------------------------------------+
+void OnTick()
+{
+   //--- Check if we are in online or test mode
+   if(IsTesting())
+   {
+      //--- Perform trade operations based on test mode
+      if(trade.PositionsTotal() == 0)
+      {
+         //--- Open a new position if no positions are open
+         trade.Buy(Symbol(), 0.1, Ask, 0, 0, 0, 'GTX Scalper');
+      }
+      else
+      {
+         //--- Close orders during a drawdown
+         double drawdown = trade.AccountEquity() - trade.AccountBalance();
+         if(drawdown >= MaxDrawdown)
+         {
+            trade.CloseAll();
+         }
+      }
+   }
+   else
+   {
+      //--- Perform trade operations based on online mode
+      // TODO: Implement online trading logic here
+   }
+}
+
+//+------------------------------------------------------------------+
+//| Expert deinitialization function                                  |
+//+------------------------------------------------------------------+
+void OnDeinit(const int reason)
+{
+   //--- Clean up resources if necessary
+}
+
+//+------------------------------------------------------------------+
